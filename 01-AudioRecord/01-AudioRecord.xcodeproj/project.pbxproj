@@ -16,6 +16,8 @@
 		D76BF12922703F7300813E99 /* AudioRecord.m in Sources */ = {isa = PBXBuildFile; fileRef = D76BF12822703F7300813E99 /* AudioRecord.m */; };
 		D7A32A512271C97B00B58EEF /* AudioPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = D7A32A4E2271C97B00B58EEF /* AudioPlayer.m */; };
 		D7A32A522271C97B00B58EEF /* AudioEncodeAAC.m in Sources */ = {isa = PBXBuildFile; fileRef = D7A32A502271C97B00B58EEF /* AudioEncodeAAC.m */; };
+		D7A32A552272A0F800B58EEF /* AudioRecordWithCapture.m in Sources */ = {isa = PBXBuildFile; fileRef = D7A32A542272A0F800B58EEF /* AudioRecordWithCapture.m */; };
+		D7A32A582272CB9800B58EEF /* AudioSimplePlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = D7A32A572272CB9800B58EEF /* AudioSimplePlayer.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -37,6 +39,10 @@
 		D7A32A4E2271C97B00B58EEF /* AudioPlayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AudioPlayer.m; sourceTree = "<group>"; };
 		D7A32A4F2271C97B00B58EEF /* AudioEncodeAAC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioEncodeAAC.h; sourceTree = "<group>"; };
 		D7A32A502271C97B00B58EEF /* AudioEncodeAAC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AudioEncodeAAC.m; sourceTree = "<group>"; };
+		D7A32A532272A0F800B58EEF /* AudioRecordWithCapture.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AudioRecordWithCapture.h; sourceTree = "<group>"; };
+		D7A32A542272A0F800B58EEF /* AudioRecordWithCapture.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AudioRecordWithCapture.m; sourceTree = "<group>"; };
+		D7A32A562272CB9800B58EEF /* AudioSimplePlayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AudioSimplePlayer.h; sourceTree = "<group>"; };
+		D7A32A572272CB9800B58EEF /* AudioSimplePlayer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AudioSimplePlayer.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -89,10 +95,14 @@
 				D76BF11422703CE100813E99 /* AudioRecordViewController.m */,
 				D76BF12722703F7300813E99 /* AudioRecord.h */,
 				D76BF12822703F7300813E99 /* AudioRecord.m */,
+				D7A32A532272A0F800B58EEF /* AudioRecordWithCapture.h */,
+				D7A32A542272A0F800B58EEF /* AudioRecordWithCapture.m */,
 				D7A32A4F2271C97B00B58EEF /* AudioEncodeAAC.h */,
 				D7A32A502271C97B00B58EEF /* AudioEncodeAAC.m */,
 				D7A32A4D2271C97B00B58EEF /* AudioPlayer.h */,
 				D7A32A4E2271C97B00B58EEF /* AudioPlayer.m */,
+				D7A32A562272CB9800B58EEF /* AudioSimplePlayer.h */,
+				D7A32A572272CB9800B58EEF /* AudioSimplePlayer.m */,
 			);
 			path = AudioRecord;
 			sourceTree = "<group>";
@@ -179,9 +189,11 @@
 				D76BF11522703CE100813E99 /* AudioRecordViewController.m in Sources */,
 				D76BF12922703F7300813E99 /* AudioRecord.m in Sources */,
 				D7A32A522271C97B00B58EEF /* AudioEncodeAAC.m in Sources */,
+				D7A32A552272A0F800B58EEF /* AudioRecordWithCapture.m in Sources */,
 				D7A32A512271C97B00B58EEF /* AudioPlayer.m in Sources */,
 				D76BF12022703CE200813E99 /* main.m in Sources */,
 				D76BF11222703CE100813E99 /* AppDelegate.m in Sources */,
+				D7A32A582272CB9800B58EEF /* AudioSimplePlayer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

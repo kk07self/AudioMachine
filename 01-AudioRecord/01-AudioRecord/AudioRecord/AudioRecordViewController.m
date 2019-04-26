@@ -11,7 +11,10 @@
 #import "AudioPlayer.h"
 #import "AudioEncodeAAC.h"
 
-@interface AudioRecordViewController ()<AudioRecordDelegate, AudioEncodeAACDelegate>
+#import "AudioRecordWithCapture.h"
+#import "AudioSimplePlayer.h"
+
+@interface AudioRecordViewController ()<AudioRecordDelegate, AudioEncodeAACDelegate, AudioRecordWithCaptureDelegate>
 
 @property (weak, nonatomic) IBOutlet UIButton *recordButton;
 @property (weak, nonatomic) IBOutlet UIButton *completeButton;
@@ -26,6 +29,12 @@
 
 /** 转码器 */
 @property (nonatomic, strong) AudioEncodeAAC *audioEncoder;
+
+/** 录音机 */
+@property (nonatomic, strong) AudioRecordWithCapture *audioRecordWithCapture;
+
+/** 播放器 */
+@property (nonatomic, strong) AudioSimplePlayer *simplePlayer;
 @end
 
 @implementation AudioRecordViewController
@@ -34,6 +43,7 @@
     [super viewDidLoad];
     self.audioEncoder.delegate = self;
     self.audioRecord.delegate = self;
+    self.audioRecordWithCapture.delegate = self;
 }
 
 
@@ -42,16 +52,25 @@
     _isPlaying = !_isPlaying;
     _recordButton.selected = _isPlaying;
     
+//    if (_isPlaying) {
+//        [self.audioRecord startRecord];
+//    } else {
+//        [self.audioRecord stopRecord];
+//    }
+    
     if (_isPlaying) {
-        [self.audioRecord startRecord];
+        [self.audioRecordWithCapture startRecord];
     } else {
-        [self.audioRecord stopRecord];
+        [self.audioRecordWithCapture stopRecord];
     }
 }
 
 
 - (IBAction)play:(UIButton *)sender {
-    [self.audioRecord stopRecord];
+//    [self.audioRecord stopRecord];
+//    [self.audioRecordWithCapture stopRecord];
+    self.simplePlayer.file = self.audioRecordWithCapture.aacFiles.lastObject;
+    [self.simplePlayer startPlay];
 }
 
 
@@ -64,7 +83,7 @@
  @param aacData 编码后的数据
  */
 - (void)audioEncoder:(AudioEncodeAAC *)encoder progressWithAACData:(NSData *)aacData {
-    NSLog(@"%@",aacData);
+//    NSLog(@"%@",aacData);
 }
 
 
@@ -77,6 +96,17 @@
 - (void)audioRecorder:(AudioRecord *)recorder outAudioData:(NSData *)data {
     [self.audioEncoder encodeData:data];
 }
+
+
+#pragma 录制回调
+- (void)audioRecorderWithCapture:(AudioRecordWithCapture *)recorder outAudioData:(NSData *)data {
+    [self.audioEncoder encodeData:data];
+}
+
+- (void)audioRecorderWithCapture:(AudioRecordWithCapture *)recorder outAudioBuffer:(CMSampleBufferRef)buffer {
+    
+}
+
 
 
 #pragma getter方法
@@ -95,4 +125,19 @@
     return _audioEncoder;
 }
 
+
+- (AudioRecordWithCapture *)audioRecordWithCapture {
+    if (!_audioRecordWithCapture) {
+        _audioRecordWithCapture = [[AudioRecordWithCapture alloc] init];
+        [_audioRecordWithCapture preparRecord];
+    }
+    return _audioRecordWithCapture;
+}
+
+- (AudioSimplePlayer *)simplePlayer {
+    if (!_simplePlayer) {
+        _simplePlayer = [[AudioSimplePlayer alloc] init];
+    }
+    return _simplePlayer;
+}
 @end

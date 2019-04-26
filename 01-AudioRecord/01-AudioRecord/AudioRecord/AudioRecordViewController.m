@@ -68,8 +68,9 @@
 
 - (IBAction)play:(UIButton *)sender {
 //    [self.audioRecord stopRecord];
-//    [self.audioRecordWithCapture stopRecord];
-    self.simplePlayer.file = self.audioRecordWithCapture.aacFiles.lastObject;
+    [self.audioRecordWithCapture stopRecord];
+//    self.simplePlayer.file = self.audioRecordWithCapture.aacFiles.lastObject;
+    self.simplePlayer.file = self.audioEncoder.filePath;
     [self.simplePlayer startPlay];
 }
 

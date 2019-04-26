@@ -76,9 +76,10 @@
         if (self.isRecording) {
             // 写入数据：
             // assetWriter写入aac
-            if (self.saveAudioFile && self.audioWriter.isReadyForMoreMediaData) {
+            if (self.saveAudioFile && self.audioWriter.isReadyForMoreMediaData && CMSampleBufferDataIsReady(sampleBuffer)) {
                 BOOL isSu = [self.audioWriter appendSampleBuffer:sampleBuffer];
-                NSLog(@"%ld", isSu);
+                NSLog(@"audioAssetStatus: %ld", (long)self.assetWriter.status);
+                NSLog(@"%d", (int)isSu);
             }
             
             // fileHandle写入pcm
@@ -136,8 +137,6 @@
     
     [self.session beginConfiguration];
     
-    self.session.sessionPreset = AVCaptureSessionPresetHigh;
-    
     if ([self.session canAddInput:self.audioInput]) {
         [self.session addInput:self.audioInput];
     }
@@ -159,9 +158,14 @@
     }
     [self.assetWriter startWriting];
     [self.assetWriter startSessionAtSourceTime:self.currentSampleTime];
+    NSLog(@"audioAssetStatus: %ld", (long)self.assetWriter.status);
 }
 
 - (void)endAssetWrite {
+    
+    if (_audioWriter == nil) {
+        return;
+    }
     
     [self.assetWriter endSessionAtSourceTime:self.currentSampleTime];
     
@@ -226,12 +230,12 @@
 
 - (NSString *)newAacFile {
     
-    NSString *file = [NSString stringWithFormat:@"%@/capture_%ld.aac",NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0],self.aacFiles.count];
+    // 即使是aac格式的，这里后缀不能写.aac
+    NSString *file = [NSString stringWithFormat:@"%@/capture_%ld.mp4",NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0],self.aacFiles.count];
     NSLog(@"%@",file);
     if ([NSFileManager.defaultManager fileExistsAtPath:file]) {
         [NSFileManager.defaultManager removeItemAtPath:file error:NULL];
     }
-//    [NSFileManager.defaultManager createFileAtPath:file contents:nil attributes:nil];
     [self.aacFiles addObject:file];
     return file;
 }

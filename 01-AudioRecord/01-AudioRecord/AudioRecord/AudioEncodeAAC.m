@@ -169,6 +169,7 @@ OSStatus inputDataProc(AudioConverterRef inAudioConverter, UInt32 *ioNumberDataP
 }
 
 - (void)encodeBuffeLengthData:(char *)buf {
+    
     // 音频解码前的输入流
     AudioBufferList inputBuffers;
     inputBuffers.mNumberBuffers = _options.channels;
@@ -206,7 +207,7 @@ OSStatus inputDataProc(AudioConverterRef inAudioConverter, UInt32 *ioNumberDataP
     NSMutableData *fullData = [NSMutableData data];
     [fullData appendData:adts];
     [fullData appendData:data];
-    
+//    free(aacBuf);
     // 处理输出的数据
     if (self.delegate && [self.delegate respondsToSelector:@selector(audioEncoder:progressWithAACData:)]) {
         [self.delegate audioEncoder:self progressWithAACData:fullData];

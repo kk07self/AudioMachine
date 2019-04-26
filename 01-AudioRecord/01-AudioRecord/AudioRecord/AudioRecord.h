@@ -55,6 +55,8 @@ NS_ASSUME_NONNULL_BEGIN
 /** 采样深度: 8 16 24 32 默认16 */
 @property (nonatomic, assign) uint bitsPerChannel;
 
+/** 声道数 */
+@property (nonatomic, assign) uint channels;
 
 @end
 NS_ASSUME_NONNULL_END

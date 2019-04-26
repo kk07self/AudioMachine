@@ -52,17 +52,17 @@
     _isPlaying = !_isPlaying;
     _recordButton.selected = _isPlaying;
     
-//    if (_isPlaying) {
-//        [self.audioRecord startRecord];
-//    } else {
-//        [self.audioRecord stopRecord];
-//    }
-    
     if (_isPlaying) {
-        [self.audioRecordWithCapture startRecord];
+        [self.audioRecord startRecord];
     } else {
-        [self.audioRecordWithCapture stopRecord];
+        [self.audioRecord stopRecord];
     }
+    
+//    if (_isPlaying) {
+//        [self.audioRecordWithCapture startRecord];
+//    } else {
+//        [self.audioRecordWithCapture stopRecord];
+//    }
 }
 
 

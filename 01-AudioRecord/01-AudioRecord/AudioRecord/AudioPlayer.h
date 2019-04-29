@@ -11,7 +11,18 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class AudioPlayerOption;
+
+@class AudioPlayerOption, AudioPlayer;
+
+@protocol AudioPlayerDataSource <NSObject>
+@optional
+
+- (Byte *)audioPlayer:(AudioPlayer *)player getBytesWithLength:(UInt32 *)length;
+- (void)audioPlayer:(AudioPlayer *)player fillWithBuffer:(Byte *)buffer withLength:(UInt32)length;
+
+@end
+
+
 @interface AudioPlayer : NSObject
 
 /** duration */
@@ -20,9 +31,15 @@ NS_ASSUME_NONNULL_BEGIN
 /** options */
 @property (nonatomic, strong) AudioPlayerOption *option;
 
+@property (nonatomic, weak) id<AudioPlayerDataSource> dataSource;
+
 /** 播放file */
 @property (nonatomic, strong) NSString *filePath;
 
+/**
+ 是不是外面直接填充数据，如果直接填充，就不调用dataSource，否则直接调用dataSource
+ */
+@property (nonatomic, assign) BOOL isEnqueueData;
 
 
 - (void)enqueueBufferWithSampleBuffer: (CMSampleBufferRef)sampleBuffer;

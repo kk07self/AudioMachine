@@ -13,8 +13,10 @@
 
 #import "AudioRecordWithCapture.h"
 #import "AudioSimplePlayer.h"
+#import "AudioPlayer.h"
+#import "AudioReader.h"
 
-@interface AudioRecordViewController ()<AudioRecordDelegate, AudioEncodeAACDelegate, AudioRecordWithCaptureDelegate>
+@interface AudioRecordViewController ()<AudioRecordDelegate, AudioEncodeAACDelegate, AudioRecordWithCaptureDelegate, AudioPlayerDataSource, AudioReaderDelegate>
 
 @property (weak, nonatomic) IBOutlet UIButton *recordButton;
 @property (weak, nonatomic) IBOutlet UIButton *completeButton;
@@ -35,6 +37,15 @@
 
 /** 播放器 */
 @property (nonatomic, strong) AudioSimplePlayer *simplePlayer;
+
+/** pcm播放器 */
+@property (nonatomic, strong) AudioPlayer *pcmPlayer;
+
+/** pcm文件流 */
+@property (assign, nonatomic) FILE *pcmFile;
+
+@property (nonatomic, strong) AudioReader *audioReader;
+
 @end
 
 @implementation AudioRecordViewController
@@ -44,6 +55,9 @@
     self.audioEncoder.delegate = self;
     self.audioRecord.delegate = self;
     self.audioRecordWithCapture.delegate = self;
+    self.pcmPlayer.dataSource = self;
+    self.pcmPlayer.isEnqueueData = YES;
+    self.audioReader.delegate = self;
 }
 
 
@@ -51,19 +65,23 @@
 - (IBAction)record:(UIButton *)sender {
     
     _isRecording = !_isRecording;
-    _recordButton.selected = _isPlaying;
-    
-    if (_isPlaying) {
-        [self.audioRecord startRecord];
-    } else {
-        [self.audioRecord stopRecord];
-    }
+    _recordButton.selected = _isRecording;
     
 //    if (_isPlaying) {
-//        [self.audioRecordWithCapture startRecord];
+//        [self.audioRecord startRecord];
 //    } else {
-//        [self.audioRecordWithCapture stopRecord];
+//        [self.audioRecord stopRecord];
 //    }
+    
+    if (_isRecording) {
+        [self.audioRecordWithCapture startRecord];
+    } else {
+        [self.audioRecordWithCapture stopRecord];
+        
+        // 设置路径试试
+        [self.audioReader setFilePath:self.audioRecordWithCapture.aacFiles.firstObject];
+        [self.audioReader startReader];
+    }
 }
 
 
@@ -82,19 +100,24 @@
     [self.simplePlayer startPlay];
 }
 
+
 - (IBAction)pcmPlayer:(UIButton *)sender {
+    
     if (_isRecording) {
         [self.audioRecord stopRecord];
         [self.audioRecordWithCapture stopRecord];
         _isRecording = NO;
     }
+    
     if (_isPlaying) {
         _isPlaying = NO;
-        [self.simplePlayer stopPlay];
+        [self.pcmPlayer stop];
         return;
     }
-    self.simplePlayer.file = self.audioEncoder.filePath;
-    [self.simplePlayer startPlay];
+    [self.pcmPlayer prepareToPlay];
+    [self.pcmPlayer play];
+    
+    //
 }
 
 
@@ -130,6 +153,24 @@
     
 }
 
+#pragma pcmPlayer dataSource
+- (void)audioPlayer:(AudioPlayer *)player fillWithBuffer:(Byte *)buffer withLength:(UInt32)length {
+    if (_pcmFile == nil) {
+        _pcmFile = fopen(self.audioRecordWithCapture.filePath.UTF8String, "r");
+    }
+    if (feof(self.pcmFile)) {
+        // 播放结束
+        [self.pcmPlayer stop];
+//        fseek(self.pcmFile, 0, SEEK_SET);
+    }
+    fread(buffer, sizeof(Byte), length, self.pcmFile);
+}
+
+- (void)audioReader:(AudioReader *)reader outputAudioBuffer:(CMSampleBufferRef)audioBuffer {
+    if (self.pcmPlayer) {
+        [_pcmPlayer enqueueBufferWithSampleBuffer:audioBuffer];
+    }
+}
 
 
 #pragma getter方法
@@ -162,5 +203,19 @@
         _simplePlayer = [[AudioSimplePlayer alloc] init];
     }
     return _simplePlayer;
+}
+
+- (AudioPlayer *)pcmPlayer {
+    if (!_pcmPlayer) {
+        _pcmPlayer = [[AudioPlayer alloc] init];
+    }
+    return _pcmPlayer;
+}
+
+- (AudioReader *)audioReader {
+    if (!_audioReader) {
+        _audioReader = [[AudioReader alloc] init];
+    }
+    return _audioReader;
 }
 @end

@@ -98,11 +98,16 @@
 }
 
 // 填充完成回调
-void AudioPlayerAQInputCallback(void *input, AudioQueueRef outQ, AudioQueueBufferRef outQB) {
+void AudioPlayerAQInputCallback(void *input, AudioQueueRef audioQueue, AudioQueueBufferRef audioQueueBuffer) {
     
     // 将填充完成的buffer空置出来，留下一个使用
     AudioPlayer *player = (__bridge AudioPlayer *)input;
-    [player resetBufferState:outQ and:outQB];
+    [player resetBufferState:audioQueue and:audioQueueBuffer];
+    if (player.isEnqueueData) {
+        return;
+    }
+    // 通过datasource获取数据
+    [player readAndPlayWithAudioQueue:audioQueue queueBuffer:audioQueueBuffer];
 }
 
 // 标致闲置的buffer
@@ -113,6 +118,28 @@ void AudioPlayerAQInputCallback(void *input, AudioQueueRef outQ, AudioQueueBuffe
         if (audioQueueBufferRef == _audioQueueBuffers[i]) {
             audioQueueBufferUsed[i] = false;
         }
+    }
+}
+
+- (void)readAndPlayWithAudioQueue:(AudioQueueRef)audioQueue queueBuffer:(AudioQueueBufferRef)audioQueueBuffe {
+    if (self.dataSource) {
+        if ([self.dataSource respondsToSelector:@selector(audioPlayer:getBytesWithLength:)]) {
+            UInt32 readLength = 0;
+            Byte *readInByte = [_dataSource audioPlayer:self getBytesWithLength:&readLength];
+            if (readLength > 0 && !!readInByte) {
+                audioQueueBuffe->mAudioDataByteSize = readLength;
+                memcpy(audioQueueBuffe->mAudioData, readInByte, readLength);
+                AudioQueueEnqueueBuffer(audioQueue, audioQueueBuffe, 0, NULL);
+            }
+        } else if ([self.dataSource respondsToSelector:@selector(audioPlayer:fillWithBuffer:withLength:)]) {
+            Byte fillBuffer[kFillBufferSize];
+            [self.dataSource audioPlayer:self fillWithBuffer:fillBuffer withLength:kFillBufferSize];
+            audioQueueBuffe->mAudioDataByteSize = kFillBufferSize;
+            memcpy(audioQueueBuffe->mAudioData, fillBuffer, kFillBufferSize);
+            AudioQueueEnqueueBuffer(audioQueue, audioQueueBuffe, 0, NULL);
+        }
+    } else {
+        NSLog(@"error-----no datasource");
     }
 }
 
@@ -129,7 +156,6 @@ void AudioPlayerAQInputCallback(void *input, AudioQueueRef outQ, AudioQueueBuffe
         free(blockBuffer);
         blockBuffer = NULL;
     }
-    
 }
 
 // 向缓冲区中填充数据
@@ -172,6 +198,12 @@ void AudioPlayerAQInputCallback(void *input, AudioQueueRef outQ, AudioQueueBuffe
 - (void)prepareToPlay {
     if (!self.isSetUpAudio) {
         [self setupAudioQueue];
+    }
+    
+    if (!self.isEnqueueData) {
+        for(int i=0; i<kQueueBufferCount; i++) {
+            [self readAndPlayWithAudioQueue:self.audioQueue queueBuffer:_audioQueueBuffers[i]];
+        }
     }
 }
 

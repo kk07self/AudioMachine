@@ -49,7 +49,8 @@
 
 
 - (IBAction)record:(UIButton *)sender {
-    _isPlaying = !_isPlaying;
+    
+    _isRecording = !_isRecording;
     _recordButton.selected = _isPlaying;
     
     if (_isPlaying) {
@@ -67,13 +68,34 @@
 
 
 - (IBAction)play:(UIButton *)sender {
-//    [self.audioRecord stopRecord];
-    [self.audioRecordWithCapture stopRecord];
-//    self.simplePlayer.file = self.audioRecordWithCapture.aacFiles.lastObject;
+    if (_isRecording) {
+        [self.audioRecord stopRecord];
+        [self.audioRecordWithCapture stopRecord];
+        _isRecording = NO;
+    }
+    if (_isPlaying) {
+        _isPlaying = NO;
+        [self.simplePlayer stopPlay];
+        return;
+    }
     self.simplePlayer.file = self.audioEncoder.filePath;
     [self.simplePlayer startPlay];
 }
 
+- (IBAction)pcmPlayer:(UIButton *)sender {
+    if (_isRecording) {
+        [self.audioRecord stopRecord];
+        [self.audioRecordWithCapture stopRecord];
+        _isRecording = NO;
+    }
+    if (_isPlaying) {
+        _isPlaying = NO;
+        [self.simplePlayer stopPlay];
+        return;
+    }
+    self.simplePlayer.file = self.audioEncoder.filePath;
+    [self.simplePlayer startPlay];
+}
 
 
 #pragma 代理回调

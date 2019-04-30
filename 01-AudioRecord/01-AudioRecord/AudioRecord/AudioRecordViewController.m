@@ -56,8 +56,8 @@
     self.audioRecord.delegate = self;
     self.audioRecordWithCapture.delegate = self;
     self.pcmPlayer.dataSource = self;
-    self.pcmPlayer.isEnqueueData = YES;
     self.audioReader.delegate = self;
+    self.pcmPlayer.isEnqueueData = NO;
 }
 
 
@@ -78,14 +78,18 @@
     } else {
         [self.audioRecordWithCapture stopRecord];
         
+        return;
         // 设置路径试试
-        [self.audioReader setFilePath:self.audioRecordWithCapture.aacFiles.firstObject];
-        [self.audioReader startReader];
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [self.audioReader setFilePath:self.audioRecordWithCapture.aacFiles.firstObject];
+            [self.audioReader startReader];
+        });
     }
 }
 
 
 - (IBAction)play:(UIButton *)sender {
+    _isPlaying = !_isPlaying;
     if (_isRecording) {
         [self.audioRecord stopRecord];
         [self.audioRecordWithCapture stopRecord];
@@ -96,13 +100,13 @@
         [self.simplePlayer stopPlay];
         return;
     }
+    _isPlaying = YES;
     self.simplePlayer.file = self.audioEncoder.filePath;
     [self.simplePlayer startPlay];
 }
 
 
 - (IBAction)pcmPlayer:(UIButton *)sender {
-    
     if (_isRecording) {
         [self.audioRecord stopRecord];
         [self.audioRecordWithCapture stopRecord];
@@ -114,10 +118,9 @@
         [self.pcmPlayer stop];
         return;
     }
+    _isPlaying = YES;
     [self.pcmPlayer prepareToPlay];
     [self.pcmPlayer play];
-    
-    //
 }
 
 
@@ -161,7 +164,10 @@
     if (feof(self.pcmFile)) {
         // 播放结束
         [self.pcmPlayer stop];
-//        fseek(self.pcmFile, 0, SEEK_SET);
+        fseek(self.pcmFile, 0, SEEK_SET);
+        [self.pcmPlayer resetPlayer];
+        [self.pcmPlayer prepareToPlay];
+        _isPlaying = NO;
     }
     fread(buffer, sizeof(Byte), length, self.pcmFile);
 }

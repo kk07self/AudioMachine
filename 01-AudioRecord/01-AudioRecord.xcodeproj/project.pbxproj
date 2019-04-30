@@ -342,7 +342,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = EJ9JZRCD2K;
+				DEVELOPMENT_TEAM = 9343N69MHG;
 				ENABLE_BITCODE = YES;
 				INFOPLIST_FILE = "01-AudioRecord/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
@@ -352,7 +352,7 @@
 				);
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_BUNDLE_IDENTIFIER = "KK.-1-AudioRecord";
+				PRODUCT_BUNDLE_IDENTIFIER = com.kk.AudioRecord;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -363,7 +363,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = EJ9JZRCD2K;
+				DEVELOPMENT_TEAM = 9343N69MHG;
 				ENABLE_BITCODE = YES;
 				INFOPLIST_FILE = "01-AudioRecord/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
@@ -372,7 +372,7 @@
 					"@executable_path/Frameworks",
 				);
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_BUNDLE_IDENTIFIER = "KK.-1-AudioRecord";
+				PRODUCT_BUNDLE_IDENTIFIER = com.kk.AudioRecord;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

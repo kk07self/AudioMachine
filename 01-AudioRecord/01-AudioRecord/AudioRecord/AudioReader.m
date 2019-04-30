@@ -39,7 +39,12 @@
 
 - (void)setupReader {
     _asset = [[AVURLAsset alloc] initWithURL:[NSURL fileURLWithPath:_filePath] options:@{AVURLAssetPreferPreciseDurationAndTimingKey: @(YES)}];
-    _audioReader = [[AVAssetReader alloc] initWithAsset:_asset error:NULL];
+    NSError *error;
+    _audioReader = [[AVAssetReader alloc] initWithAsset:_asset error:&error];
+    if (error != nil) {
+        NSLog(@"%@",error.localizedDescription);
+        return;
+    }
     
     NSDictionary *audioS = @{AVFormatIDKey: @(kAudioFormatLinearPCM), // pcm格式
                          AVNumberOfChannelsKey: @(1), // 采样通道

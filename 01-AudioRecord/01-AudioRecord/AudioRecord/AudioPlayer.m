@@ -70,7 +70,6 @@
     asbd.mBitsPerChannel = 16;//每个采样点16bit量化
     asbd.mBytesPerFrame = (asbd.mBitsPerChannel/8) * asbd.mChannelsPerFrame;
     asbd.mBytesPerPacket = asbd.mBytesPerFrame * asbd.mFramesPerPacket;
-    
     return asbd;
 }
 
@@ -88,7 +87,7 @@
         
         NSError *error = nil;
         [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback withOptions:AVAudioSessionCategoryOptionMixWithOthers error:&error];
-        [[AVAudioSession sharedInstance] setPreferredSampleRate:self.sampleRate error:&error];
+        [[AVAudioSession sharedInstance] setPreferredSampleRate:self.option.sampleRate error:&error];
         [[AVAudioSession sharedInstance] setActive:YES error:&error];
         if (error) {
             NSLog(@"AVAudioSession Error: %@", error.localizedDescription);
@@ -156,10 +155,21 @@ void AudioPlayerAQInputCallback(void *input, AudioQueueRef audioQueue, AudioQueu
         free(blockBuffer);
         blockBuffer = NULL;
     }
+    
 }
 
 // 向缓冲区中填充数据
 - (void)enqueueBufferWithData:(NSData *)data {
+    
+    if (!self.isSetUpAudio) {
+        [self setupAudioQueue];
+    }
+    self.tempData = [NSMutableData new];
+    [self.tempData appendData: data];
+    // 得到数据
+    NSUInteger len = self.tempData.length;
+    Byte *bytes = (Byte*)malloc(len);
+    [self.tempData getBytes:bytes length: len];
     
     // 找出闲置的buffer
     int i = 0;
@@ -174,8 +184,10 @@ void AudioPlayerAQInputCallback(void *input, AudioQueueRef audioQueue, AudioQueu
             }
         }
     }
-    self->_audioQueueBuffers[i] -> mAudioDataByteSize = (unsigned int)data.length;
-    memcmp(self->_audioQueueBuffers[i] -> mAudioData, data.bytes, data.length);
+    self->_audioQueueBuffers[i] -> mAudioDataByteSize = (unsigned int)len;
+    memcmp(self->_audioQueueBuffers[i] -> mAudioData, bytes, len);
+    free(bytes);
+    bytes = NULL;
     AudioQueueEnqueueBuffer(self.audioQueue, self->_audioQueueBuffers[i], 0, NULL);
 }
 

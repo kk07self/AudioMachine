@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		4B50DA07227736F700B826D7 /* AudioReader.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B50DA06227736F700B826D7 /* AudioReader.m */; };
+		4B9D500722B7D55F00EFC0A7 /* DemoListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B9D500622B7D55F00EFC0A7 /* DemoListViewController.m */; };
+		4B9D500A22B7D5B900EFC0A7 /* AudioRecordWithAVAudioRecord.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B9D500922B7D5B900EFC0A7 /* AudioRecordWithAVAudioRecord.m */; };
 		D76BF11222703CE100813E99 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = D76BF11122703CE100813E99 /* AppDelegate.m */; };
 		D76BF11522703CE100813E99 /* AudioRecordViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D76BF11422703CE100813E99 /* AudioRecordViewController.m */; };
 		D76BF11822703CE100813E99 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D76BF11622703CE100813E99 /* Main.storyboard */; };
@@ -24,6 +26,11 @@
 /* Begin PBXFileReference section */
 		4B50DA05227736F700B826D7 /* AudioReader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AudioReader.h; sourceTree = "<group>"; };
 		4B50DA06227736F700B826D7 /* AudioReader.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AudioReader.m; sourceTree = "<group>"; };
+		4B9D500522B7D55F00EFC0A7 /* DemoListViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DemoListViewController.h; sourceTree = "<group>"; };
+		4B9D500622B7D55F00EFC0A7 /* DemoListViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DemoListViewController.m; sourceTree = "<group>"; };
+		4B9D500822B7D5B900EFC0A7 /* AudioRecordWithAVAudioRecord.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AudioRecordWithAVAudioRecord.h; sourceTree = "<group>"; };
+		4B9D500922B7D5B900EFC0A7 /* AudioRecordWithAVAudioRecord.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AudioRecordWithAVAudioRecord.m; sourceTree = "<group>"; };
+		4B9D500B22B7D77B00EFC0A7 /* AudioRecordProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AudioRecordProtocol.h; sourceTree = "<group>"; };
 		D76BF10D22703CE100813E99 /* 01-AudioRecord.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "01-AudioRecord.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D76BF11022703CE100813E99 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		D76BF11122703CE100813E99 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -82,6 +89,8 @@
 				D76BF12622703F4400813E99 /* AudioRecord */,
 				D76BF11022703CE100813E99 /* AppDelegate.h */,
 				D76BF11122703CE100813E99 /* AppDelegate.m */,
+				4B9D500522B7D55F00EFC0A7 /* DemoListViewController.h */,
+				4B9D500622B7D55F00EFC0A7 /* DemoListViewController.m */,
 				D76BF11622703CE100813E99 /* Main.storyboard */,
 				D76BF11922703CE200813E99 /* Assets.xcassets */,
 				D76BF11B22703CE200813E99 /* LaunchScreen.storyboard */,
@@ -96,8 +105,11 @@
 			children = (
 				D76BF11322703CE100813E99 /* AudioRecordViewController.h */,
 				D76BF11422703CE100813E99 /* AudioRecordViewController.m */,
+				4B9D500B22B7D77B00EFC0A7 /* AudioRecordProtocol.h */,
 				D76BF12722703F7300813E99 /* AudioRecord.h */,
 				D76BF12822703F7300813E99 /* AudioRecord.m */,
+				4B9D500822B7D5B900EFC0A7 /* AudioRecordWithAVAudioRecord.h */,
+				4B9D500922B7D5B900EFC0A7 /* AudioRecordWithAVAudioRecord.m */,
 				D7A32A532272A0F800B58EEF /* AudioRecordWithCapture.h */,
 				D7A32A542272A0F800B58EEF /* AudioRecordWithCapture.m */,
 				D7A32A4F2271C97B00B58EEF /* AudioEncodeAAC.h */,
@@ -196,7 +208,9 @@
 				D7A32A522271C97B00B58EEF /* AudioEncodeAAC.m in Sources */,
 				4B50DA07227736F700B826D7 /* AudioReader.m in Sources */,
 				D7A32A552272A0F800B58EEF /* AudioRecordWithCapture.m in Sources */,
+				4B9D500722B7D55F00EFC0A7 /* DemoListViewController.m in Sources */,
 				D7A32A512271C97B00B58EEF /* AudioPlayer.m in Sources */,
+				4B9D500A22B7D5B900EFC0A7 /* AudioRecordWithAVAudioRecord.m in Sources */,
 				D76BF12022703CE200813E99 /* main.m in Sources */,
 				D76BF11222703CE100813E99 /* AppDelegate.m in Sources */,
 				D7A32A582272CB9800B58EEF /* AudioSimplePlayer.m in Sources */,
@@ -341,8 +355,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 9343N69MHG;
+				DEVELOPMENT_TEAM = HA5G797698;
 				ENABLE_BITCODE = YES;
 				INFOPLIST_FILE = "01-AudioRecord/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
@@ -354,6 +369,7 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.kk.AudioRecord;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -362,8 +378,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 9343N69MHG;
+				DEVELOPMENT_TEAM = HA5G797698;
 				ENABLE_BITCODE = YES;
 				INFOPLIST_FILE = "01-AudioRecord/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
@@ -374,6 +391,7 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.kk.AudioRecord;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;

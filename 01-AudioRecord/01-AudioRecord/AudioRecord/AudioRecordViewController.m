@@ -52,6 +52,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
     self.audioEncoder.delegate = self;
     self.audioRecord.delegate = self;
     self.audioRecordWithCapture.delegate = self;
@@ -67,29 +68,28 @@
     _isRecording = !_isRecording;
     _recordButton.selected = _isRecording;
     
-//    if (_isPlaying) {
-//        [self.audioRecord startRecord];
-//    } else {
-//        [self.audioRecord stopRecord];
-//    }
-    
+    if (_isPlaying) {
+        [self.audioRecord startRecord];
+    } else {
+        [self.audioRecord stopRecord];
+    }
+    return;
     if (_isRecording) {
         [self.audioRecordWithCapture startRecord];
     } else {
         [self.audioRecordWithCapture stopRecord];
         
         return;
-        // 设置路径试试
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [self.audioReader setFilePath:self.audioRecordWithCapture.aacFiles.firstObject];
-            [self.audioReader startReader];
-        });
+//        // 设置路径试试
+//        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+//            [self.audioReader setFilePath:self.audioRecordWithCapture.aacFiles.firstObject];
+//            [self.audioReader startReader];
+//        });
     }
 }
 
 
 - (IBAction)play:(UIButton *)sender {
-    _isPlaying = !_isPlaying;
     if (_isRecording) {
         [self.audioRecord stopRecord];
         [self.audioRecordWithCapture stopRecord];
@@ -159,7 +159,8 @@
 #pragma pcmPlayer dataSource
 - (void)audioPlayer:(AudioPlayer *)player fillWithBuffer:(Byte *)buffer withLength:(UInt32)length {
     if (_pcmFile == nil) {
-        _pcmFile = fopen(self.audioRecordWithCapture.filePath.UTF8String, "r");
+//        _pcmFile = fopen(self.audioRecordWithCapture.filePath.UTF8String, "r");
+        _pcmFile = fopen(self.audioRecord.filePath.UTF8String, "r");
     }
     if (feof(self.pcmFile)) {
         // 播放结束

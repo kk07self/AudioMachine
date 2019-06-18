@@ -1,8 +1,8 @@
 //
-//  AudioRecordWithCaptrue.h
+//  AudioRecorderOption.h
 //  01-AudioRecord
 //
-//  Created by tutu on 2019/4/26.
+//  Created by tutu on 2019/6/18.
 //  Copyright © 2019 KK. All rights reserved.
 //
 
@@ -11,9 +11,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-
-@interface AudioRecordWithCapture : NSObject<AudioRecorder>
-
+@interface AudioRecorderOption : NSObject<AudioRecorderOptions>
 
 @end
 

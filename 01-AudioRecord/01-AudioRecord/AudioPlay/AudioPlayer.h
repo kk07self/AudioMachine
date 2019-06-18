@@ -34,7 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, weak) id<AudioPlayerDataSource> dataSource;
 
 /** 播放file */
-@property (nonatomic, strong) NSString *filePath;
+@property (nonatomic, copy) NSString *filePath;
 
 /**
  是不是外面直接填充数据，如果直接填充，就不调用dataSource，否则直接调用dataSource

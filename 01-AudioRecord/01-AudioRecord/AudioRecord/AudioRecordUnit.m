@@ -6,11 +6,11 @@
 //  Copyright © 2019 KK. All rights reserved.
 //
 
-#import "AudioRecord.h"
+#import "AudioRecordUnit.h"
 #import <AVFoundation/AVFoundation.h>
 #import <AudioUnit/AudioUnit.h>
 
-@interface AudioRecord() {
+@interface AudioRecordUnit() {
     // 音频格式信息配置
     AudioStreamBasicDescription audioFormat;
     // 音频录制单元
@@ -25,7 +25,7 @@
 
 @end
 
-@implementation AudioRecord
+@implementation AudioRecordUnit
 
 - (instancetype)init {
     if (self = [super init]) {
@@ -149,7 +149,7 @@ static OSStatus recordingCallBack(void *inRefCon,
                                   UInt32 inNumberFrames,
                                   AudioBufferList *ioData) {
     
-    AudioRecord *record = (__bridge AudioRecord *)(inRefCon);
+    AudioRecordUnit *record = (__bridge AudioRecordUnit *)(inRefCon);
     record->bufferList.mNumberBuffers = 1;
     record->bufferList.mBuffers[0].mDataByteSize = sizeof(SInt16)*inNumberFrames; // 数据大小
     record->bufferList.mBuffers[0].mNumberChannels = record.defaultOption.channels; // 频道数

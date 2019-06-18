@@ -9,8 +9,36 @@
 #ifndef AudioRecordProtocol_h
 #define AudioRecordProtocol_h
 
+#import <AVFoundation/AVFoundation.h>
 
-@protocol AudioRecordOptions <NSObject>
+typedef NS_ENUM(NSInteger, AudioRecorderStatus) {
+    AudioRecorderStatusUnknow,
+    AudioRecorderStatusPrepare,
+    AudioRecorderStatusRecording,
+    AudioRecorderStatusPause,
+    AudioRecorderStatusCompleted,
+    AudioRecorderStatusError
+};
+
+@protocol AudioRecorder;
+
+@protocol AudioRecorderDelegate <NSObject>
+
+- (void)audioRecorder:(id<AudioRecorder> )recorder outAudioData:(NSData *)data;
+
+- (void)audioRecorder:(id<AudioRecorder> )recorder outAudioBuffer:(CMSampleBufferRef)buffer;
+
+- (void)audioRecorder:(id<AudioRecorder> )recorder complete:(NSString *)audioFilePath;
+
+- (void)audioRecorder:(id<AudioRecorder> )recorder error:(NSError *)error;
+
+- (void)audioRecorder:(id<AudioRecorder> )recorder statusChanged:(AudioRecorderStatus)status;
+
+@end
+
+
+
+@protocol AudioRecorderOptions <NSObject>
 
 /** 采样率: 默认44100 */
 @property (nonatomic, assign) Float64 sampleRate;
@@ -21,31 +49,45 @@
 /** 声道数 */
 @property (nonatomic, assign) uint channels;
 
+/** 音频格式 */
+@property (nonatomic, assign) UInt32 formatIDKey;
+
+/**
+ options Dic
+ */
+@property (nonatomic, strong) NSDictionary *audioRecorderSettings;
+
 @end
 
 
 #pragma mark - AudioRecordBase
-@protocol AudioRecordBase <NSObject>
 
-@property (nonatomic, strong) id<AudioRecordOptions> options;
+@protocol AudioRecorder <NSObject>
 
-- (instancetype)initWithOption:(id<AudioRecordOptions>)options;
+@property (nonatomic, strong) id<AudioRecorderOptions> options;
+
+
+@property (nonatomic, weak) id<AudioRecorderDelegate> delegate;
+
+/** 是否保存到本地：默认YES */
+@property (nonatomic, assign) BOOL saveAudioFile;
+
+/** 保存的路径 */
+@property (nonatomic, strong) NSString *filePath;
+
+
+- (instancetype)initWithOption:(id<AudioRecorderOptions>)options;
 
 - (void)preparRecord;
 
 - (BOOL)startRecord;
+
+- (void)pause;
 
 - (void)stopRecord;
 
 - (void)completeRecord;
 
 @end
-
-//
-//@protocol AudioRecordDelegate <NSObject>
-//
-//- (void)audioRecorder:(id<AudioRecordBase> )recorder outAudioData:(NSData *)data;
-//
-//@end
 
 #endif /* AudioRecordProtocol_h */

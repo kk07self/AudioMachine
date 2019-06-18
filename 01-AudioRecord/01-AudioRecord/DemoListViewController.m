@@ -10,16 +10,22 @@
 
 @interface DemoListViewController ()
 {
-    NSMutableArray *_models;
+    NSArray *_models;
+    NSArray *_viewControllerSegueIDS;
 }
 @end
+
+
 
 @implementation DemoListViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    _models = [NSMutableArray arrayWithCapacity:5];
-    [_models addObject:@"SimpleAudioRecord"];
+    _models = @[@"SimpleAudioRecord",
+                @"Audio List"];
+    _viewControllerSegueIDS = @[@"AudioRecordViewController",
+                                @"AudioFileListViewController"];
+    
     [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"DemoListViewController"];
 }
 
@@ -37,12 +43,14 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"DemoListViewController" forIndexPath:indexPath];
+    cell.textLabel.text = _models[indexPath.row];
+    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     return cell;
 }
 
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    [self performSegueWithIdentifier:@"AudioRecordViewController" sender:nil];
+    [self performSegueWithIdentifier:_viewControllerSegueIDS[indexPath.row] sender:indexPath];
 }
 
 

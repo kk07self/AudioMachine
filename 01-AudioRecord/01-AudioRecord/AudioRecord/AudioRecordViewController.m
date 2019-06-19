@@ -7,16 +7,19 @@
 //
 
 #import "AudioRecordViewController.h"
-#import "AudioRecord.h"
+#import "AudioRecordUnit.h"
 #import "AudioPlayer.h"
 #import "AudioEncodeAAC.h"
 
+#import "AudioSimpleRecorder.h"
 #import "AudioRecordWithCapture.h"
 #import "AudioSimplePlayer.h"
 #import "AudioPlayer.h"
 #import "AudioReader.h"
+#import "AudioFile.h"
+#import "AudioRecorderOption.h"
 
-@interface AudioRecordViewController ()<AudioRecordDelegate, AudioEncodeAACDelegate, AudioRecordWithCaptureDelegate, AudioPlayerDataSource, AudioReaderDelegate>
+@interface AudioRecordViewController ()<AudioRecorderDelegate, AudioEncodeAACDelegate, AudioPlayerDataSource, AudioReaderDelegate>
 
 @property (weak, nonatomic) IBOutlet UIButton *recordButton;
 @property (weak, nonatomic) IBOutlet UIButton *completeButton;
@@ -27,13 +30,21 @@
 @property (nonatomic, assign) BOOL isPlaying;
 
 /** 录制器 */
-@property (nonatomic, strong) AudioRecord *audioRecord;
+@property (nonatomic, strong) AudioRecordUnit *audioUnitRecord;
+
+/**
+ 录音器
+ */
+@property (nonatomic, strong) id<AudioRecorder> audioRecord;
 
 /** 转码器 */
 @property (nonatomic, strong) AudioEncodeAAC *audioEncoder;
 
 /** 录音机 */
-@property (nonatomic, strong) AudioRecordWithCapture *audioRecordWithCapture;
+@property (nonatomic, strong) AudioRecordWithCapture *audioCaptureRecorder;
+
+/** 录音机 */
+@property (nonatomic, strong) AudioSimpleRecorder *simpleRecorder;
 
 /** 播放器 */
 @property (nonatomic, strong) AudioSimplePlayer *simplePlayer;
@@ -46,6 +57,17 @@
 
 @property (nonatomic, strong) AudioReader *audioReader;
 
+
+/**
+ aac file
+ */
+@property (nonatomic, strong) NSString *aacFilePath;
+
+/**
+ pcm filePath
+ */
+@property (nonatomic, strong) NSString *pcmFilePath;
+
 @end
 
 @implementation AudioRecordViewController
@@ -53,46 +75,65 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.audioEncoder.delegate = self;
+    switch (self.recorderType) {
+        case AudioRecorderTypeSimple:
+            self.audioRecord = self.simpleRecorder;
+            break;
+            
+        case AudioRecorderTypeCapture:
+            self.audioRecord = self.simpleRecorder;
+            break;
+        case AudioRecorderTypeUnit:
+            self.audioRecord = self.simpleRecorder;
+            break;
+        default:
+            break;
+    }
+    
     self.audioRecord.delegate = self;
-    self.audioRecordWithCapture.delegate = self;
+//    self.audioEncoder.delegate = self;
+//    self.audioRecord.delegate = self;
+//    self.audioCaptureRecorder.delegate = self;
+    
     self.pcmPlayer.dataSource = self;
     self.audioReader.delegate = self;
     self.pcmPlayer.isEnqueueData = NO;
 }
 
-
+- (void)createFilePath {
+    
+}
 
 - (IBAction)record:(UIButton *)sender {
     
     _isRecording = !_isRecording;
     _recordButton.selected = _isRecording;
     
-    if (_isPlaying) {
+    if (_isRecording) {
         [self.audioRecord startRecord];
     } else {
         [self.audioRecord stopRecord];
     }
     return;
-    if (_isRecording) {
-        [self.audioRecordWithCapture startRecord];
-    } else {
-        [self.audioRecordWithCapture stopRecord];
-        
+//    if (_isRecording) {
+//        [self.audioCaptureRecorder startRecord];
+//    } else {
+//        [self.audioCaptureRecorder stopRecord];
+    
         return;
 //        // 设置路径试试
 //        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-//            [self.audioReader setFilePath:self.audioRecordWithCapture.aacFiles.firstObject];
+//            [self.audioReader setFilePath:self.audioCaptureRecorder.aacFiles.firstObject];
 //            [self.audioReader startReader];
 //        });
-    }
+//    }
 }
 
 
 - (IBAction)play:(UIButton *)sender {
     if (_isRecording) {
         [self.audioRecord stopRecord];
-        [self.audioRecordWithCapture stopRecord];
+//        [self.audioCaptureRecorder stopRecord];
         _isRecording = NO;
     }
     if (_isPlaying) {
@@ -101,7 +142,8 @@
         return;
     }
     _isPlaying = YES;
-    self.simplePlayer.file = self.audioEncoder.filePath;
+//    self.simplePlayer.file = self.audioEncoder.filePath;
+    self.simplePlayer.file = self.audioRecord.filePath;
     [self.simplePlayer startPlay];
 }
 
@@ -109,7 +151,7 @@
 - (IBAction)pcmPlayer:(UIButton *)sender {
     if (_isRecording) {
         [self.audioRecord stopRecord];
-        [self.audioRecordWithCapture stopRecord];
+        [self.audioCaptureRecorder stopRecord];
         _isRecording = NO;
     }
     
@@ -136,42 +178,55 @@
 }
 
 
+
+- (void)audioRecorder:(id<AudioRecorder>)recorder outAudioData:(NSData *)data {
+    
+}
+
+- (void)audioRecorder:(id<AudioRecorder>)recorder statusChanged:(AudioRecorderStatus)status {
+    NSLog(@"-----status:%d",status);
+}
+
+- (void)audioRecorder:(id<AudioRecorder>)recorder complete:(NSString *)audioFilePath {
+    NSLog(@"-----finished");
+}
+
 /**
  音频录制回调
 
  @param recorder 录制器
  @param data 录制的数据
  */
-- (void)audioRecorder:(AudioRecord *)recorder outAudioData:(NSData *)data {
-    [self.audioEncoder encodeData:data];
-}
-
-
-#pragma 录制回调
-- (void)audioRecorderWithCapture:(AudioRecordWithCapture *)recorder outAudioData:(NSData *)data {
-    [self.audioEncoder encodeData:data];
-}
-
-- (void)audioRecorderWithCapture:(AudioRecordWithCapture *)recorder outAudioBuffer:(CMSampleBufferRef)buffer {
-    
-}
+//- (void)audioRecorder:(AudioRecord *)recorder outAudioData:(NSData *)data {
+//    [self.audioEncoder encodeData:data];
+//}
+//
+//
+//#pragma 录制回调
+//- (void)audioRecorderWithCapture:(audioCaptureRecorder *)recorder outAudioData:(NSData *)data {
+//    [self.audioEncoder encodeData:data];
+//}
+//
+//- (void)audioRecorderWithCapture:(audioCaptureRecorder *)recorder outAudioBuffer:(CMSampleBufferRef)buffer {
+//
+//}
 
 #pragma pcmPlayer dataSource
-- (void)audioPlayer:(AudioPlayer *)player fillWithBuffer:(Byte *)buffer withLength:(UInt32)length {
-    if (_pcmFile == nil) {
-//        _pcmFile = fopen(self.audioRecordWithCapture.filePath.UTF8String, "r");
-        _pcmFile = fopen(self.audioRecord.filePath.UTF8String, "r");
-    }
-    if (feof(self.pcmFile)) {
-        // 播放结束
-        [self.pcmPlayer stop];
-        fseek(self.pcmFile, 0, SEEK_SET);
-        [self.pcmPlayer resetPlayer];
-        [self.pcmPlayer prepareToPlay];
-        _isPlaying = NO;
-    }
-    fread(buffer, sizeof(Byte), length, self.pcmFile);
-}
+//- (void)audioPlayer:(AudioPlayer *)player fillWithBuffer:(Byte *)buffer withLength:(UInt32)length {
+//    if (_pcmFile == nil) {
+////        _pcmFile = fopen(self.audioCaptureRecorder.filePath.UTF8String, "r");
+//        _pcmFile = fopen(self.audioRecord.filePath.UTF8String, "r");
+//    }
+//    if (feof(self.pcmFile)) {
+//        // 播放结束
+//        [self.pcmPlayer stop];
+//        fseek(self.pcmFile, 0, SEEK_SET);
+//        [self.pcmPlayer resetPlayer];
+//        [self.pcmPlayer prepareToPlay];
+//        _isPlaying = NO;
+//    }
+//    fread(buffer, sizeof(Byte), length, self.pcmFile);
+//}
 
 - (void)audioReader:(AudioReader *)reader outputAudioBuffer:(CMSampleBufferRef)audioBuffer {
     if (self.pcmPlayer) {
@@ -180,13 +235,13 @@
 }
 
 
-#pragma getter方法
-- (AudioRecord *)audioRecord {
-    if (_audioRecord == nil) {
-        _audioRecord = [[AudioRecord alloc] init];
-        [_audioRecord preparRecord];
+#pragma mark - getter方法
+- (AudioRecordUnit *)audioUnitRecord {
+    if (_audioUnitRecord == nil) {
+        _audioUnitRecord = [[AudioRecordUnit alloc] init];
+        [_audioUnitRecord preparRecord];
     }
-    return _audioRecord;
+    return _audioUnitRecord;
 }
 
 - (AudioEncodeAAC *)audioEncoder {
@@ -196,13 +251,30 @@
     return _audioEncoder;
 }
 
-
-- (AudioRecordWithCapture *)audioRecordWithCapture {
-    if (!_audioRecordWithCapture) {
-        _audioRecordWithCapture = [[AudioRecordWithCapture alloc] init];
-        [_audioRecordWithCapture preparRecord];
+- (id<AudioRecorder>)audioRecord {
+    if (!_audioRecord) {
+        _audioRecord = [self simpleRecorder];
     }
-    return _audioRecordWithCapture;
+    return _audioRecord;
+}
+
+- (AudioSimpleRecorder *)simpleRecorder {
+    if (!_simpleRecorder) {
+        AudioRecorderOption *option = [[AudioRecorderOption alloc] init];
+        option.formatIDKey = kAudioFormatMPEG4AAC;
+        _simpleRecorder = [[AudioSimpleRecorder alloc] initWithOption:option];
+        _simpleRecorder.filePath = [self aacFilePath];
+        [_simpleRecorder preparRecord];
+    }
+    return _simpleRecorder;
+}
+
+- (AudioRecordWithCapture *)audioCaptureRecorder {
+    if (!_audioCaptureRecorder) {
+        _audioCaptureRecorder = [[AudioRecordWithCapture alloc] init];
+        [_audioCaptureRecorder preparRecord];
+    }
+    return _audioCaptureRecorder;
 }
 
 - (AudioSimplePlayer *)simplePlayer {
@@ -225,4 +297,23 @@
     }
     return _audioReader;
 }
+
+- (NSString *)aacFilePath {
+    if (!_aacFilePath) {
+        NSInteger count = [[AudioFile audioFile] countOfFileType:@".aac"];
+        NSString *fileName = [NSString stringWithFormat:@"%02ld.aac", (long)count];
+        _aacFilePath = [[AudioFile audioFile] createAudioFile:fileName];
+    }
+    return _aacFilePath;
+}
+
+- (NSString *)pcmFilePath {
+    if (!_pcmFilePath) {
+        NSInteger count = [[AudioFile audioFile] countOfFileType:@".pcm"];
+        NSString *fileName = [NSString stringWithFormat:@"%02ld.pcm", (long)count];
+        _aacFilePath = [[AudioFile audioFile] createAudioFile:fileName];
+    }
+    return _pcmFilePath;
+}
+
 @end

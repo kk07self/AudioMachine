@@ -11,16 +11,16 @@
 NS_ASSUME_NONNULL_BEGIN
 
 
-@class AudioRecordOption, AudioRecord;
+@class AudioRecordOption, AudioRecordUnit;
 
 @protocol AudioRecordDelegate <NSObject>
 
-- (void)audioRecorder:(AudioRecord *)recorder outAudioData:(NSData *)data;
+- (void)audioRecorder:(AudioRecordUnit *)recorder outAudioData:(NSData *)data;
 
 @end
 
 
-@interface AudioRecord : NSObject
+@interface AudioRecordUnit : NSObject
 
 /** option */
 @property (nonatomic, strong) AudioRecordOption *defaultOption;

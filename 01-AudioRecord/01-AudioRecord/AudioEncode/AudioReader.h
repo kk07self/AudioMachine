@@ -20,6 +20,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)audioReader:(AudioReader *)reader outputBytes:(Byte *)bytes length:(UInt32)length;
 
+- (void)audioReader:(AudioReader *)reader statusChanged:(AVAssetReaderStatus)status;
+
+- (void)audioReaderCompleted:(AudioReader *)reader;
+
 @end
 
 @interface AudioReader : NSObject
@@ -32,7 +36,16 @@ NS_ASSUME_NONNULL_BEGIN
 /** 选项 */
 @property (nonatomic, strong) AudioReaderOption *option;
 
+
+/**
+ 是否只读一帧， 默认是NO
+ */
+@property (nonatomic, assign) BOOL isReadOneSampleBuffer;
+
 - (void)startReader;
+
+- (void)peekSampleBuffer;
+
 @end
 
 

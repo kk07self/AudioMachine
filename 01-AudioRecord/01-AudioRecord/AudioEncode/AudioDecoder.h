@@ -1,19 +1,16 @@
 //
-//  AudioRecordWithCaptrue.h
+//  AudioDecoder.h
 //  01-AudioRecord
 //
-//  Created by tutu on 2019/4/26.
+//  Created by K K on 2019/6/19.
 //  Copyright © 2019 KK. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
-#import "AudioRecordProtocol.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-
-@interface AudioRecordWithCapture : NSObject<AudioRecorder>
-
+@interface AudioDecoder : NSObject
 
 @end
 

@@ -33,7 +33,6 @@
 
 - (void)setFilePath:(NSString *)filePath {
     _filePath = filePath;
-    
     [self setupReader];
 }
 
@@ -47,7 +46,7 @@
     }
     
     NSDictionary *audioS = @{AVFormatIDKey: @(kAudioFormatLinearPCM), // pcm格式
-                         AVNumberOfChannelsKey: @(1), // 采样通道
+                         AVNumberOfChannelsKey: @(self.option.channels), // 采样通道
                      AVLinearPCMIsBigEndianKey: @(false), // 音频采用高位优先的记录格式
                          AVLinearPCMIsFloatKey: @(false), // 采样信号是否浮点数
                         AVLinearPCMBitDepthKey: @(16) // 音频的每个样点的位数
@@ -56,15 +55,34 @@
     if ([_audioReader canAddOutput:_audioOutput]) {
         [_audioReader addOutput:_audioOutput];
     }
-    _queue = dispatch_queue_create("kk.com", DISPATCH_QUEUE_SERIAL);
+    _queue = dispatch_queue_create("com.reader.kk", DISPATCH_QUEUE_SERIAL);
 }
 
 - (void)startReader {
-    if ([_audioReader startReading]) {
+    
+    if (_audioReader.status != AVAssetReaderStatusReading) {
+        [_audioReader startReading];
+    }
+    
+    if (self.audioReader.status == AVAssetReaderStatusReading) {
+        [self notificate];
         dispatch_async(_queue, ^{
             while (1) {
                 CMSampleBufferRef audioBuffer = [self->_audioOutput copyNextSampleBuffer];
-                if (audioBuffer == NULL || self->_audioReader.status != AVAssetReaderStatusReading) {
+                if (audioBuffer == NULL) {
+                    [self notificate];
+                    if (self.delegate && [self.delegate respondsToSelector:@selector(audioReaderCompleted:)]) {
+                        [self.delegate audioReaderCompleted:self];
+                    }
+                    break;
+                }
+                if (self->_audioReader.status != AVAssetReaderStatusReading) {
+                    [self notificate];
+                    if (self->_audioReader.status == AVAssetReaderStatusCompleted) {
+                        if (self.delegate && [self.delegate respondsToSelector:@selector(audioReaderCompleted:)]) {
+                            [self.delegate audioReaderCompleted:self];
+                        }
+                    }
                     break;
                 }
                 if (self.delegate) {
@@ -72,8 +90,25 @@
                         [self.delegate audioReader:self outputAudioBuffer:audioBuffer];
                     }
                 }
+                
+                // 只读一帧
+                if (self.isReadOneSampleBuffer) {
+                    break;
+                }
             }
         });
+        return;
+    }
+    [self notificate];
+}
+
+- (void)peekSampleBuffer {
+    [self startReader];
+}
+
+- (void)notificate {
+    if (self.delegate && [self.delegate respondsToSelector:@selector(audioReader:statusChanged:)]) {
+        [self.delegate audioReader:self statusChanged:_audioReader.status];
     }
 }
 

@@ -8,6 +8,7 @@
 
 #import "AudioRecordWithCapture.h"
 #import <AVFoundation/AVFoundation.h>
+#import "AudioRecorderOption.h"
 
 @interface AudioRecordWithCapture()<AVCaptureAudioDataOutputSampleBufferDelegate>
 /** 音频输入设备 */
@@ -40,22 +41,25 @@
 @end
 
 
+
 @implementation AudioRecordWithCapture
+
+@synthesize options;
+@synthesize delegate;
+@synthesize saveAudioFile;
+@synthesize filePath;
+
+- (instancetype)initWithOption:(id<AudioRecorderOptions>)options {
+    if (self = [super init]) {
+        self.options = options;
+    }
+    return self;
+}
 
 - (instancetype)init {
     if (self = [super init]) {
-        
-        _defaultOption = [[AudioRecordWithCaptureOption alloc] init];
-        _saveAudioFile = YES;
-        
-        // pcm文件保存
-        _filePath = [NSString stringWithFormat:@"%@/capture.pcm",[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask][0].path];
-        if ([NSFileManager.defaultManager fileExistsAtPath:_filePath]) {
-            [NSFileManager.defaultManager removeItemAtPath:_filePath error:NULL];
-        }
-        [NSFileManager.defaultManager createFileAtPath:_filePath contents:nil attributes:nil];
-        _fileHandle = [NSFileHandle fileHandleForWritingAtPath:_filePath];
-        [self setupSession];
+        AudioRecorderOption *option = [[AudioRecorderOption alloc] init];
+        self.options = option;
     }
     return self;
 }
@@ -91,44 +95,66 @@
             [self.fileHandle writeData:data];
             
             // 代理回调
-            if ([self.delegate respondsToSelector:@selector(audioRecorderWithCapture:outAudioData:)]) {
+            if ([self.delegate respondsToSelector:@selector(audioRecorder:outAudioData:)]) {
                 // data
-                [self.delegate audioRecorderWithCapture:self outAudioData:data];
+                [self.delegate audioRecorder:self outAudioData:data];
             }
-            if ([self.delegate respondsToSelector:@selector(audioRecorderWithCapture:outAudioBuffer:)]) {
-                [self.delegate audioRecorderWithCapture:self outAudioBuffer:sampleBuffer];
+            if ([self.delegate respondsToSelector:@selector(audioRecorder:outAudioBuffer:)]) {
+                [self.delegate audioRecorder:self outAudioBuffer:sampleBuffer];
             }
         }
     }
 }
 
+
+- (void)notificateStatus:(AudioRecorderStatus)status {
+    if (self.delegate && [self.delegate respondsToSelector:@selector(audioRecorder:statusChanged:)]) {
+        [self.delegate audioRecorder:self statusChanged:status];
+    }
+}
+
+
+
 #pragma play controller
 - (void)preparRecord {
-    [self.session startRunning];
+    [self setupSession];
+    [self notificateStatus:AudioRecorderStatusPrepare];
 }
 
-- (void)startRecord {
-    if (self.session.isRunning == NO) {
-        [self preparRecord];
+- (BOOL)startRecord {
+    if (self.session.isRunning) {
+        return YES;
     }
+    
+    if (self.session.isRunning == NO) {
+        [self.session startRunning];
+    }
+    
     [self startAssetWriter];
-    self.isRecording = YES;
+    self.isRecording = self.session.isRunning;
+    
+    [self notificateStatus:AudioRecorderStatusRecording];
+    return self.session.isRunning;
 }
 
-- (void)pauseRecord {
-    self.isRecording = NO;
-}
 
 - (void)stopRecord {
     self.isRecording = NO;
     [self endAssetWrite];
     [self.session stopRunning];
+    [self notificateStatus:AudioRecorderStatusCompleted];
 }
 
 - (void)completeRecord {
     self.isRecording = NO;
     [self endAssetWrite];
     [self.session stopRunning];
+    [self notificateStatus:AudioRecorderStatusCompleted];
+}
+
+- (void)pause {
+    self.isRecording = NO;
+    [self notificateStatus:AudioRecorderStatusPause];
 }
 
 
@@ -182,7 +208,7 @@
 #pragma setter getter
 - (AVAssetWriter *)assetWriter {
     if (!_assetWriter) {
-        _assetWriter = [[AVAssetWriter alloc] initWithURL:[NSURL fileURLWithPath:[self newAacFile]] fileType:AVFileTypeMPEG4 error:NULL];
+        _assetWriter = [[AVAssetWriter alloc] initWithURL:[NSURL fileURLWithPath:[self filePath]] fileType:AVFileTypeMPEG4 error:NULL];
     }
     return _assetWriter;
 }
@@ -191,10 +217,9 @@
     if (!_audioWriter) {
         AudioChannelLayout acl;
         acl.mChannelLayoutTag = kAudioChannelLayoutTag_Mono;
-        NSDictionary *audioSetting = @{AVFormatIDKey: [NSNumber numberWithInt:kAudioFormatMPEG4AAC],
-//                                       AVEncoderBitDepthHintKey: @(32),
-                                       AVSampleRateKey: @(44100.0),
-                                       AVNumberOfChannelsKey: @(1),
+        NSDictionary *audioSetting = @{AVFormatIDKey: [NSNumber numberWithInt:options.formatIDKey],
+                                       AVSampleRateKey: @(options.sampleRate),
+                                       AVNumberOfChannelsKey: @(options.channels),
                                        AVEncoderBitRateKey: @(64000),
                                        AVChannelLayoutKey: [NSData dataWithBytes:&acl length:sizeof(AudioChannelLayout)]
                                        };
@@ -227,37 +252,6 @@
     return _audioInput;
 }
 
-
-- (NSString *)newAacFile {
-    
-    // 即使是aac格式的，这里后缀不能写.aac
-    NSString *file = [NSString stringWithFormat:@"%@/capture_%ld.mp4",NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0],self.aacFiles.count];
-    NSLog(@"%@",file);
-    if ([NSFileManager.defaultManager fileExistsAtPath:file]) {
-        [NSFileManager.defaultManager removeItemAtPath:file error:NULL];
-    }
-    [self.aacFiles addObject:file];
-    return file;
-}
-
-- (NSMutableArray *)aacFiles {
-    if (!_aacFiles) {
-        _aacFiles = [NSMutableArray array];
-    }
-    return _aacFiles;
-}
-
 @end
 
 
-
-@implementation AudioRecordWithCaptureOption
-- (instancetype)init {
-    if (self = [super init]) {
-        
-        _sampleRate = 44100;
-        _bitsPerChannel = 16;
-    }
-    return self;
-}
-@end

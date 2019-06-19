@@ -8,9 +8,19 @@
 
 #import <UIKit/UIKit.h>
 
+typedef NS_ENUM(NSInteger, AudioRecorderType) {
+    AudioRecorderTypeSimple = 0,
+    AudioRecorderTypeCapture,
+    AudioRecorderTypeUnit
+};
+
+
 @interface AudioRecordViewController : UIViewController
 
-
+/**
+ 录音器类型
+ */
+@property (nonatomic, assign) AudioRecorderType recorderType;
 
 @end
 

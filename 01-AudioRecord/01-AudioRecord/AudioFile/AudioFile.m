@@ -84,6 +84,9 @@ static AudioFile *_audioFile;
 }
 
 - (NSFileHandle *)createFileHandleWithAudioFilePath:(NSString *)audioFile {
+    if (audioFile == nil) {
+        return nil;
+    }
     NSFileHandle *fileHandle = [self.fileHandles objectForKey:audioFile];
     if (!fileHandle) {
         fileHandle = [NSFileHandle fileHandleForWritingAtPath:audioFile];

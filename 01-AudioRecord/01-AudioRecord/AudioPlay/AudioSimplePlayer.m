@@ -41,7 +41,7 @@
 
 
 - (void)setFile:(NSString *)file {
-    
+    _file = file;
     [self.player stop];
     NSError *error;
     self.player = [[AVAudioPlayer alloc] initWithContentsOfURL:[NSURL fileURLWithPath:file] error:&error];
@@ -51,4 +51,5 @@
     }
     [self.player prepareToPlay];
 }
+
 @end

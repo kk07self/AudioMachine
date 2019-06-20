@@ -35,7 +35,6 @@
     if (self = [super init]) {
         _options = [[AudioEncodeAACOption alloc] init];
         _isSaveToFile = YES;
-        _filePath = [NSString stringWithFormat:@"%@/demo.aac",NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0]];
         leftBuffer = malloc(1024*2*2); // 即使频道数是2个也够用
     }
     return self;

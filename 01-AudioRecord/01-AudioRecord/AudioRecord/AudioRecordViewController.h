@@ -22,5 +22,10 @@ typedef NS_ENUM(NSInteger, AudioRecorderType) {
  */
 @property (nonatomic, assign) AudioRecorderType recorderType;
 
+/**
+ 是否解码
+ */
+@property (nonatomic, assign) BOOL isEncodeToAAC;
+
 @end
 

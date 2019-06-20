@@ -52,7 +52,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)pause;
 - (void)stop;
 - (void)resetPlayer;
-
+- (void)changeSpeed:(double)speed;
 
 @end
 

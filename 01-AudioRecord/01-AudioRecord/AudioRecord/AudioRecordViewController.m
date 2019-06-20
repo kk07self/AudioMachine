@@ -270,6 +270,7 @@
         option.formatIDKey = kAudioFormatMPEG4AAC;
         _audioCaptureRecorder = [[AudioRecordWithCapture alloc] initWithOption:option];
         _audioCaptureRecorder.filePath = self.aacFilePath;
+        _audioCaptureRecorder.saveAudioFile = YES;
         [_audioCaptureRecorder preparRecord];
     }
     return _audioCaptureRecorder;
@@ -299,7 +300,7 @@
 - (NSString *)aacFilePath {
     if (!_aacFilePath) {
         NSInteger count = [[AudioFile audioFile] countOfFileType:@".mp4"];
-        NSString *fileName = [NSString stringWithFormat:@"MP4-%02ld-%@.mp4", (long)count, [self typeName]];
+        NSString *fileName = [NSString stringWithFormat:@"MP4-%@-%02ld.mp4", [self typeName], (long)count];
         _aacFilePath = [[AudioFile audioFile] createAudioFile:fileName];
     }
     return _aacFilePath;
@@ -309,7 +310,7 @@
 - (NSString *)aacFilePathFromEncode {
     if (!_aacFilePathFromEncode) {
         NSInteger count = [[AudioFile audioFile] countOfFileType:@".aac"];
-        NSString *fileName = [NSString stringWithFormat:@"AAC-%02ld-%@-Encode.aac", (long)count, [self typeName]];
+        NSString *fileName = [NSString stringWithFormat:@"AAC-%@-%02ld-Encode.aac", [self typeName], (long)count];
         _aacFilePathFromEncode = [[AudioFile audioFile] createAudioFile:fileName];
     }
     return _aacFilePathFromEncode;

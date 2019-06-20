@@ -192,7 +192,6 @@
         [self.assetWriter addInput:self.audioWriter];
     }
     [self.assetWriter startWriting];
-
     [self.assetWriter startSessionAtSourceTime:self.currentSampleTime];
     NSLog(@"audioAssetStatus: %ld", (long)self.assetWriter.status);
 }
@@ -230,7 +229,6 @@
         NSDictionary *audioSetting = @{AVFormatIDKey: [NSNumber numberWithInt:options.formatIDKey],
                                        AVSampleRateKey: @(options.sampleRate),
                                        AVNumberOfChannelsKey: @(options.channels),
-                                       AVEncoderBitRateKey: @(64000),
                                        AVChannelLayoutKey: [NSData dataWithBytes:&acl length:sizeof(AudioChannelLayout)]
                                        };
         

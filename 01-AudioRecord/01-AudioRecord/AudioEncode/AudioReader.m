@@ -86,9 +86,19 @@
                     break;
                 }
                 if (self.delegate) {
+                    // 帧代理
                     if ([self.delegate respondsToSelector:@selector(audioReader:outputAudioBuffer:)]) {
                         [self.delegate audioReader:self outputAudioBuffer:audioBuffer];
                     }
+                    
+                    // 数据代理
+//                    if ([self.delegate respondsToSelector:@selector(audioReader:outputBytes:length:)]) {
+//                        CMBlockBufferRef blockBufferRef = CMSampleBufferGetDataBuffer(audioBuffer);
+//                        size_t length = CMBlockBufferGetDataLength(blockBufferRef);
+//                        Byte buffer[length];
+//                        CMBlockBufferCopyDataBytes(blockBufferRef, 0, length, buffer);
+//                        [self.delegate audioReader:self outputBytes:buffer length:(UInt32)length];
+//                    }
                 }
                 
                 // 只读一帧

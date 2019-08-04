@@ -254,6 +254,16 @@ void AudioPlayerAQInputCallback(void *input, AudioQueueRef audioQueue, AudioQueu
     return (double)timeStamp.mSampleTime/_audioDescription.mSampleRate;
 }
 
+
+- (BOOL)isPlaying {
+    UInt32 playing = 0;
+    UInt32 size = sizeof(playing);
+    AudioQueueGetProperty(_audioQueue, kAudioQueueProperty_IsRunning, &playing, &size);
+    NSLog(@"playstatus: %d", playing);
+    return playing == 1;
+}
+
+
 #pragma mark - dealloc
 - (void)dealloc {
     NSLog(@"KKAudioPlayer-----dealloc");

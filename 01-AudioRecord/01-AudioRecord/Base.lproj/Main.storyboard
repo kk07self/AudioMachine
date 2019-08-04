@@ -66,10 +66,44 @@
                             <outlet property="delegate" destination="q4m-1R-AyF" id="REj-Tt-AxJ"/>
                         </connections>
                     </tableView>
+                    <connections>
+                        <segue destination="wCP-Wh-qYu" kind="show" identifier="AudioPlayerViewController" id="APf-x9-GJ1"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="E09-UP-ZDK" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-1126" y="852"/>
+        </scene>
+        <!--Audio Player View Controller-->
+        <scene sceneID="DL6-7D-QZX">
+            <objects>
+                <viewController storyboardIdentifier="AudioPlayerViewController" id="wCP-Wh-qYu" customClass="AudioPlayerViewController" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="pZo-Af-xkD">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eDA-sb-gNS">
+                                <rect key="frame" x="79" y="185" width="31" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="解码"/>
+                                <connections>
+                                    <action selector="decode:" destination="wCP-Wh-qYu" eventType="touchUpInside" id="1Bf-dj-mLE"/>
+                                    <action selector="play:" destination="wCP-Wh-qYu" eventType="touchUpInside" id="Bwo-kL-tYE"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ykD-fi-udB">
+                                <rect key="frame" x="79" y="265" width="31" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="播放"/>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <viewLayoutGuide key="safeArea" id="qKI-KC-OQs"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="6AE-dE-m6e" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-245" y="852"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="yZM-dT-jwS">

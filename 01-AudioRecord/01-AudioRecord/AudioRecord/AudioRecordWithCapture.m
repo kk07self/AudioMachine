@@ -47,7 +47,7 @@
 @synthesize options;
 @synthesize delegate;
 @synthesize saveAudioFile;
-@synthesize filePath;
+@synthesize filePath = _filePath;
 
 - (instancetype)initWithOption:(id<AudioRecorderOptions>)options {
     if (self = [super init]) {
@@ -80,7 +80,8 @@
         if (self.isRecording) {
             // 写入数据：
             // assetWriter写入aac
-            if (self.saveAudioFile && self.audioWriter.isReadyForMoreMediaData && CMSampleBufferDataIsReady(sampleBuffer)) {
+            
+            if (self.saveAudioFile && self.audioWriter.isReadyForMoreMediaData) {
                 BOOL isSu = [self.audioWriter appendSampleBuffer:sampleBuffer];
                 NSLog(@"audioAssetStatus: %ld", (long)self.assetWriter.status);
                 NSLog(@"%d", (int)isSu);
@@ -92,7 +93,7 @@
             Byte buffer[length];
             CMBlockBufferCopyDataBytes(blockBufferRef, 0, length, buffer);
             NSData *data = [NSData dataWithBytes:buffer length:length];
-            [self.fileHandle writeData:data];
+//            [self.fileHandle writeData:data];
             
             // 代理回调
             if ([self.delegate respondsToSelector:@selector(audioRecorder:outAudioData:)]) {
@@ -183,6 +184,9 @@
         [self.assetWriter addInput:self.audioWriter];
     }
     [self.assetWriter startWriting];
+    if (CMTIME_IS_INVALID(self.currentSampleTime)) {
+        self.currentSampleTime = kCMTimeZero;
+    }
     [self.assetWriter startSessionAtSourceTime:self.currentSampleTime];
     NSLog(@"audioAssetStatus: %ld", (long)self.assetWriter.status);
 }
@@ -217,10 +221,17 @@
     if (!_audioWriter) {
         AudioChannelLayout acl;
         acl.mChannelLayoutTag = kAudioChannelLayoutTag_Mono;
+        self.options.formatIDKey = kAudioFormatMPEG4AAC;
         NSDictionary *audioSetting = @{AVFormatIDKey: [NSNumber numberWithInt:options.formatIDKey],
                                        AVSampleRateKey: @(options.sampleRate),
                                        AVNumberOfChannelsKey: @(options.channels),
-                                       AVEncoderBitRateKey: @(64000),
+//                                       AVEncoderBitDepthHintKey: @(16),
+                                       AVSampleRateKey: @(44100.0),
+//                                       AVLinearPCMIsBigEndianKey: @(NO),
+//                                       AVLinearPCMIsFloatKey: @(YES),
+//                                       AVLinearPCMBitDepthKey: @(32),
+//                                       AVLinearPCMIsNonInterleaved: @(NO),
+//                                       AVEncoderBitRateKey: @(64000),
                                        AVChannelLayoutKey: [NSData dataWithBytes:&acl length:sizeof(AudioChannelLayout)]
                                        };
         
@@ -250,6 +261,17 @@
         _audioInput = [AVCaptureDeviceInput deviceInputWithDevice:device error:NULL];
     }
     return _audioInput;
+}
+
+- (NSString *)filePath {
+    
+    if (!_filePath) {
+        NSLog(@"filePath ---- is null");
+    }
+    if ([[NSFileManager defaultManager] fileExistsAtPath:_filePath]) {
+        [[NSFileManager defaultManager] removeItemAtPath:_filePath error:nil];
+    }
+    return _filePath;
 }
 
 @end

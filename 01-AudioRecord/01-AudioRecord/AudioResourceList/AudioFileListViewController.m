@@ -56,9 +56,14 @@
 
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    AudioPlayerViewController *vc = [[AudioPlayerViewController alloc] init];
-    vc.filePath = [[AudioFile audioFile] createAudioFile:[[AudioFile audioFile] fileNameFromAudioFile:self.datas[indexPath.row]]];
-    [self.navigationController pushViewController:vc animated:YES];
+    [self performSegueWithIdentifier:@"AudioPlayerViewController" sender:[[AudioFile audioFile] createAudioFile:[[AudioFile audioFile] fileNameFromAudioFile:self.datas[indexPath.row]]]];
+}
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    if ([segue.destinationViewController isKindOfClass:[AudioPlayerViewController class]]) {
+        AudioPlayerViewController *vc = (AudioPlayerViewController*)segue.destinationViewController;
+        vc.filePath = (NSString *)sender;
+    }
 }
 
 @end

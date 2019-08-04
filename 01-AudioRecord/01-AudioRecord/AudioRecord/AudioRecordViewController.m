@@ -77,12 +77,13 @@
     
     switch (self.recorderType) {
         case AudioRecorderTypeSimple:
-            self.audioRecord = self.simpleRecorder;
+            self.audioRecord = self.audioCaptureRecorder;
             break;
             
         case AudioRecorderTypeCapture:
-            self.audioRecord = self.simpleRecorder;
+            self.audioRecord = self.audioCaptureRecorder;
             break;
+            
         case AudioRecorderTypeUnit:
             self.audioRecord = self.simpleRecorder;
             break;
@@ -143,7 +144,7 @@
     }
     _isPlaying = YES;
 //    self.simplePlayer.file = self.audioEncoder.filePath;
-    self.simplePlayer.file = self.audioRecord.filePath;
+    self.simplePlayer.file = self.aacFilePath;
     [self.simplePlayer startPlay];
 }
 
@@ -272,6 +273,8 @@
 - (AudioRecordWithCapture *)audioCaptureRecorder {
     if (!_audioCaptureRecorder) {
         _audioCaptureRecorder = [[AudioRecordWithCapture alloc] init];
+        _audioCaptureRecorder.filePath = [self aacFilePath];
+        _audioCaptureRecorder.saveAudioFile = YES;
         [_audioCaptureRecorder preparRecord];
     }
     return _audioCaptureRecorder;
@@ -300,8 +303,8 @@
 
 - (NSString *)aacFilePath {
     if (!_aacFilePath) {
-        NSInteger count = [[AudioFile audioFile] countOfFileType:@".aac"];
-        NSString *fileName = [NSString stringWithFormat:@"%02ld.aac", (long)count];
+        NSInteger count = [[AudioFile audioFile] countOfFileType:@".mp4"];
+        NSString *fileName = [NSString stringWithFormat:@"%02ld.mp4", (long)count];
         _aacFilePath = [[AudioFile audioFile] createAudioFile:fileName];
     }
     return _aacFilePath;

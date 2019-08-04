@@ -41,6 +41,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, assign) BOOL isEnqueueData;
 
+/** 是否正在播放 */
+@property (nonatomic, assign) BOOL isPlaying;
 
 - (void)enqueueBufferWithSampleBuffer: (CMSampleBufferRef)sampleBuffer;
 
@@ -52,7 +54,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)pause;
 - (void)stop;
 - (void)resetPlayer;
-
+- (void)changeSpeed:(double)speed;
 
 @end
 

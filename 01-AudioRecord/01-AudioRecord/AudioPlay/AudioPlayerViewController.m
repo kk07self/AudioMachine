@@ -21,6 +21,11 @@
 
 @property (nonatomic, assign) UInt32 flag;
 
+/**
+ UIButton
+ */
+@property (nonatomic, strong) UIButton *changedSpeed;
+
 @end
 
 @implementation AudioPlayerViewController
@@ -28,23 +33,38 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    self.view.backgroundColor = [UIColor whiteColor];
+    
     self.reader.filePath = _filePath;
     self.reader.delegate = self;
     
     self.player.dataSource = self;
     
     _pcmDatas = [NSMutableData data];
+    
+    _changedSpeed = [[UIButton alloc] initWithFrame:CGRectMake(15, 100, 60, 40)];
+    [_changedSpeed setTitle:@"变速" forState:UIControlStateNormal];
+    [_changedSpeed setTitleColor:[UIColor orangeColor] forState:UIControlStateNormal];
+    [_changedSpeed addTarget:self action:@selector(changeSpeed:) forControlEvents:UIControlEventTouchUpInside];
+    
+    [self.view addSubview:_changedSpeed];
+}
+
+- (void)changeSpeed:(UIButton *)btn {
+    btn.selected = !btn.selected;
+    [self.player changeSpeed:btn.selected ? 2.0 : 1.0];
 }
 
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
     [self.reader startReader];
+    [self.player play];
 }
 
 #pragma mark - AudioReaderDelegate
 - (void)audioReaderCompleted:(AudioReader *)reader {
     NSLog(@"--------read completed");
-    [self.player prepareToPlay];
-    [self.player play];
+//    [self.player prepareToPlay];
+//    [self.player play];
 }
 
 - (void)audioReader:(AudioReader *)reader statusChanged:(AVAssetReaderStatus)status {
@@ -59,11 +79,11 @@
     size_t length = CMBlockBufferGetDataLength(blockBufferRef);
     Byte buffer[length];
     CMBlockBufferCopyDataBytes(blockBufferRef, 0, length, buffer);
-    [_pcmDatas appendBytes:buffer length:length];
+    [self.player enqueueBufferWithData:[NSData dataWithBytes:buffer length:length]];
+//    [_pcmDatas appendBytes:buffer length:length];
 }
 
 - (void)audioReader:(AudioReader *)reader outputBytes:(Byte *)bytes length:(UInt32)length {
-    
 }
 
 #pragma mark - AudioPlayDatasouce
@@ -84,7 +104,8 @@
 - (AudioPlayer *)player {
     if (!_player) {
         _player = [[AudioPlayer alloc] init];
-        _player.isEnqueueData = NO;
+        _player.isEnqueueData = YES;
+        [_player prepareToPlay];
     }
     return _player;
 }

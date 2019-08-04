@@ -35,8 +35,6 @@
 /** 是否开启了录制 */
 @property (nonatomic, assign) BOOL isRecording;
 
-/** fileHandle */
-@property (nonatomic, strong) NSFileHandle *fileHandle;
 
 @end
 
@@ -52,6 +50,7 @@
 - (instancetype)initWithOption:(id<AudioRecorderOptions>)options {
     if (self = [super init]) {
         self.options = options;
+        self.currentSampleTime = kCMTimeZero;
     }
     return self;
 }
@@ -60,6 +59,7 @@
     if (self = [super init]) {
         AudioRecorderOption *option = [[AudioRecorderOption alloc] init];
         self.options = option;
+        self.currentSampleTime = kCMTimeZero;
     }
     return self;
 }
@@ -87,13 +87,12 @@
                 NSLog(@"%d", (int)isSu);
             }
             
-            // fileHandle写入pcm
+            
             CMBlockBufferRef blockBufferRef = CMSampleBufferGetDataBuffer(sampleBuffer);
             size_t length = CMBlockBufferGetDataLength(blockBufferRef);
             Byte buffer[length];
             CMBlockBufferCopyDataBytes(blockBufferRef, 0, length, buffer);
             NSData *data = [NSData dataWithBytes:buffer length:length];
-//            [self.fileHandle writeData:data];
             
             // 代理回调
             if ([self.delegate respondsToSelector:@selector(audioRecorder:outAudioData:)]) {
@@ -120,10 +119,13 @@
 - (void)preparRecord {
     [self setupSession];
     [self notificateStatus:AudioRecorderStatusPrepare];
+    if (self.session.isRunning == NO) {
+        [self.session startRunning];
+    }
 }
 
 - (BOOL)startRecord {
-    if (self.session.isRunning) {
+    if (self.isRecording) {
         return YES;
     }
     
@@ -141,9 +143,13 @@
 
 - (void)stopRecord {
     self.isRecording = NO;
-    [self endAssetWrite];
     [self.session stopRunning];
+    [self endAssetWrite];
     [self notificateStatus:AudioRecorderStatusCompleted];
+    
+    if (self.delegate && [self.delegate respondsToSelector:@selector(audioRecorder:complete:)]) {
+        [self.delegate audioRecorder:self complete:_filePath];
+    }
 }
 
 - (void)completeRecord {
@@ -151,6 +157,9 @@
     [self endAssetWrite];
     [self.session stopRunning];
     [self notificateStatus:AudioRecorderStatusCompleted];
+    if (self.delegate && [self.delegate respondsToSelector:@selector(audioRecorder:complete:)]) {
+        [self.delegate audioRecorder:self complete:_filePath];
+    }
 }
 
 - (void)pause {

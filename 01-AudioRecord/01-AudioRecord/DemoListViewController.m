@@ -7,6 +7,7 @@
 //
 
 #import "DemoListViewController.h"
+#import "AudioRecordViewController.h"
 
 @interface DemoListViewController ()
 {
@@ -22,8 +23,12 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     _models = @[@"SimpleAudioRecord",
+                @"CaptureAudioRecord",
+                @"CaptureAudioRecordAndEncodeToAAC",
                 @"Audio List"];
     _viewControllerSegueIDS = @[@"AudioRecordViewController",
+                                @"AudioRecordViewController",
+                                @"AudioRecordViewController",
                                 @"AudioFileListViewController"];
     
     [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"DemoListViewController"];
@@ -50,14 +55,25 @@
 
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    [self performSegueWithIdentifier:_viewControllerSegueIDS[indexPath.row] sender:indexPath];
+    [self performSegueWithIdentifier:_viewControllerSegueIDS[indexPath.row] sender:_models[indexPath.row]];
 }
 
 
 #pragma mark - 跳转
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    NSLog(@"%@",segue);
+    NSString *model = (NSString *)sender;
+    if ([model isEqualToString:@"SimpleAudioRecord"]) {
+        AudioRecordViewController *vc = (AudioRecordViewController *)(segue.destinationViewController);
+        vc.recorderType = AudioRecorderTypeSimple;
+    } else if ([model isEqualToString:@"CaptureAudioRecord"]) {
+        AudioRecordViewController *vc = (AudioRecordViewController *)(segue.destinationViewController);
+        vc.recorderType = AudioRecorderTypeCapture;
+    } else if ([model isEqualToString:@"CaptureAudioRecordAndEncodeToAAC"]) {
+        AudioRecordViewController *vc = (AudioRecordViewController *)(segue.destinationViewController);
+        vc.recorderType = AudioRecorderTypeCapture;
+        vc.isEncodeToAAC = YES;
+    }
 }
 
 @end

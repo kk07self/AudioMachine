@@ -239,7 +239,7 @@ void AudioPlayerAQInputCallback(void *input, AudioQueueRef audioQueue, AudioQueu
 }
 
 - (void)changeSpeed:(double)speed {
-    _audioDescription.mSampleRate = _sampleRate*speed;
+    _audioDescription.mSampleRate = self.option.sampleRate*speed;
     [self resetPlayer];
     self.isSetUpAudio = NO;
     [self setupAudioQueue];
